@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="حوّل نصوص دروسك إلى أسئلة تدريبية متنوعة وراجع دراستك بسهولة.">
     <link rel="shortcut icon" href="Screenshot 2026-10-28 192102.png" type="image/x-icon">
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -10,52 +11,51 @@
     <title>اختبر نفسك</title>
 </head>
 
+<body>
 <header>
     <nav>
         <div class="wq">
-            <img style="object-fit: cover; " src="Screenshot_2026-10-28_192102-removebg-preview.png" alt="">
+            <img src="Screenshot_2026-10-28_192102-removebg-preview.png" alt="شعار منهجك أسئلة">
             <div class="ko">
-        <h2 class="so">منهجك <span class="font">اسئلة</span></h2>
+        <h2 class="so">منهجك <span class="font">أسئلة</span></h2>
         <small>منهجك في صورة أسئلة</small>
     </div>
     </div>
         <ul>
-        <li><a class="s" href="">الرئيسيه</a></li>
-        <li><a href="" class="ssa">حول الموقع</a></li>
-        <li><a href="" class="ssa">المميزات</a></li>
-        <li><a href="" class="ssa">كيفيه الاستخدام</a></li>
-        <li><a href="" class="ssa">تواصل معنا</a></li>
+        <li><a class="s" href="#home">الرئيسية</a></li>
+        <li><a href="#how" class="ssa">حول الموقع</a></li>
+        <li><a href="#features" class="ssa">المميزات</a></li>
+        <li><a href="#workspace" class="ssa">طريقة الاستخدام</a></li>
+        <li><a href="#contact" class="ssa">تواصل معنا</a></li>
         </ul>
-        <button class="bar">تسجيل دخول ↗</button>
+        <a class="bar nav-cta" href="#workspace">ابدأ الآن ↗</a>
     </nav>
 </header>
 
-<body>
-    <section class="rele">
+    <section class="rele" id="home">
         <div class="saction1">
             <div class="ro">
-        <h2 class="h11">حول منهجك الدراسي الي</h2>
-        <h1 class="tol">اسئله احترافيه</h1>
+        <h2 class="h11">حوّل منهجك الدراسي إلى</h2>
+        <h1 class="tol">أسئلة احترافية</h1>
     </div>
         <div class="kko">
-            <p class="prgraf">ادخل منهجك او كتابك.ودع الذكاء الاصطناعي يحول الي </p>
-            <p class="prgraf">مجموعه من الاسئله المتنوعه. اختيار من متعدد.صح او خطأ.  </p>
-            <p class="prgraf">مقالي و اكمل.لتسهيل المذاكره والمراجعه</p>
+            <p class="prgraf">أدخل نص منهجك أو كتابك، وحوّله إلى مجموعة من الأسئلة المتنوعة.</p>
+            <p class="prgraf">اختيار من متعدد، وصح أو خطأ، وأسئلة مقالية لتسهيل المذاكرة والمراجعة.</p>
         </div>
         <div class="goui">
-        <button class="bar">ابدأ الان <span>↙</span></button>
-        <button class="klp">اكتشف كيف يعمل</button>
+        <a class="bar" href="#workspace">ابدأ الآن <span>↙</span></a>
+        <a class="klp" href="#how">اكتشف كيف يعمل</a>
     </div>
     <div class="smoll">
-    <p>⚡سريع</p>
-    <p>🎯دقيق</p>
-    <p>⚙️سهل الاستخدام</p>
+    <p>⚡ سريع</p>
+    <p>🎯 عملي</p>
+    <p>⚙️ سهل الاستخدام</p>
     </div>
     </div>
     </section>
 
-    <section class="lopl">
-    <p class="l">بكل سهوله</p>
+    <section class="lopl" id="how">
+    <p class="l">بكل سهولة</p>
     <h2 class="g">كيف يعمل الموقع؟</h2>
     <p class="f">ثلاث خطوات بسيطة لتبدأ مراجعتك.</p>
    <br>
@@ -82,14 +82,14 @@
         <div class="ddf">☷</div>
         <p class="loff">03</p>
         <h3>ابدأ الاختبار</h3>
-        <p class="dd">اوب عن الأسئلة وشاهد نتيجتك في نهاية الاختبار.</p>
+        <p class="dd">أجب عن الأسئلة وشاهد نتيجتك في نهاية الاختبار.</p>
         </div>
     </section>
 
  </section>
     <br>
     <br>
-    <main class="container">
+    <main class="container" id="workspace">
    
         <div class="hosp">
             <div class="logo">✧</div>
@@ -163,9 +163,23 @@
 
             <div class="upload-box">
                 <strong>📄 ارفع ملف المنهج</strong>
-                <p>يدعم هذا النموذج ملفات TXT النصية فقط.</p>
+                <p>يدعم ملفات TXT وPDF، أو استيراد مستند/ملف عام من Google Drive.</p>
                 <input id="fileInput" type="file"
-                       accept=".txt,text/plain">
+                       accept=".txt,.pdf,text/plain,application/pdf">
+
+                <div class="drive-import">
+                    <label for="driveUrl">أو الصق رابط ملف من Google Drive</label>
+                    <div class="drive-controls">
+                        <input id="driveUrl" type="url" dir="ltr"
+                               placeholder="https://drive.google.com/file/d/..."
+                               aria-label="رابط ملف عام من Google Drive">
+                        <button id="driveImportBtn" class="main-btn" type="button">
+                            استيراد من Drive
+                        </button>
+                    </div>
+                    <p id="importStatus" class="import-status" role="status"
+                       aria-live="polite"></p>
+                </div>
             </div>
 
             <div class="text-block">
@@ -214,7 +228,7 @@
 
 </div>
 </main>
-<div class="uy">
+<section class="uy" id="features">
 <div class="hhg">
     <p class="gdgd">مصمم للمذاكرة</p>
     <h2 class="eewe">كل ما تحتاجه للمراجعة</h2>
@@ -254,14 +268,13 @@
         </div>
         
  </div>
-</div>
-</div>
+ </section>
 
-<footer>
-      <div class="wq">
-            <img style="object-fit: cover; " src="Screenshot_2026-10-28_192102-removebg-preview.png" alt="">
+ <footer id="contact">
+       <div class="wq">
+             <img src="Screenshot_2026-10-28_192102-removebg-preview.png" alt="شعار منهجك أسئلة">
             <div class="ko">
-        <h2 class="so">منهجك <span class="font">اسئلة</span></h2>
+        <h2 class="so">منهجك <span class="font">أسئلة</span></h2>
         <small>منهجك في صورة أسئلة</small>
     </div>
     </div>
@@ -271,13 +284,10 @@
     </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<script src="main.js" defer></script>
 </body>
 </html>
-
-
-
-
-
 
 
 

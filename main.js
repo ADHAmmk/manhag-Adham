@@ -3,31 +3,174 @@ const textArea = document.getElementById('lessonText');
 const fileInput = document.getElementById('fileInput');
 const charCount = document.getElementById('charCount');
 const results = document.getElementById('results');
+const driveUrlInput = document.getElementById('driveUrl');
+const driveImportBtn = document.getElementById('driveImportBtn');
+const importStatus = document.getElementById('importStatus');
 
 textArea.addEventListener('input', () => {
     charCount.textContent = `${textArea.value.length} حرف`;
 });
 
-// قراءة ملف TXT
+function setLessonText(text) {
+    const trimmedText = text.trim();
+
+    if (!trimmedText) {
+        throw new Error('لم يتم العثور على نص قابل للقراءة في الملف.');
+    }
+
+    textArea.value = trimmedText;
+    charCount.textContent = `${trimmedText.length} حرف`;
+}
+
+function setImportStatus(message, isError = false) {
+    importStatus.textContent = message;
+    importStatus.classList.toggle('error', isError);
+}
+
+async function extractPdfText(data) {
+    if (!window.pdfjsLib) {
+        throw new Error('تعذر تحميل أداة قراءة PDF. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
+    }
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const pdf = await pdfjsLib.getDocument({ data }).promise;
+    const pages = [];
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+        pages.push(content.items.map(item => item.str).join(' '));
+    }
+
+    const text = pages.join('\n');
+
+    if (!text.trim()) {
+        throw new Error('لم يُعثر على نص داخل PDF؛ قد يحتاج الملف الممسوح ضوئيًا إلى OCR.');
+    }
+
+    return text;
+}
+
+async function readFile(file) {
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (extension === 'txt' || file.type === 'text/plain') {
+        setLessonText(await file.text());
+        return;
+    }
+
+    if (extension === 'pdf' || file.type === 'application/pdf') {
+        setLessonText(await extractPdfText(new Uint8Array(await file.arrayBuffer())));
+        return;
+    }
+
+    throw new Error('نوع الملف غير مدعوم. اختر ملف TXT أو PDF.');
+}
+
+function getDriveFileId(url) {
+    const match = url.pathname.match(/\/(?:file|document)\/d\/([^/]+)/);
+    return url.searchParams.get('id') || (match && match[1]);
+}
+
+async function importFromDrive() {
+    const sharedUrl = driveUrlInput.value.trim();
+
+    if (!sharedUrl) {
+        setImportStatus('الصق رابط مشاركة Google Drive أولًا.', true);
+        driveUrlInput.focus();
+        return;
+    }
+
+    let url;
+
+    try {
+        url = new URL(sharedUrl);
+    } catch {
+        setImportStatus('الرابط غير صالح. الصق رابط Google Drive كاملًا.', true);
+        return;
+    }
+
+    if (!['drive.google.com', 'docs.google.com'].includes(url.hostname)) {
+        setImportStatus('استخدم رابطًا من drive.google.com أو docs.google.com.', true);
+        return;
+    }
+
+    const fileId = getDriveFileId(url);
+
+    if (!fileId) {
+        setImportStatus('لم أتمكن من تحديد الملف. استخدم رابط مشاركة لملف أو مستند.', true);
+        return;
+    }
+
+    driveImportBtn.disabled = true;
+    setImportStatus('جارٍ استيراد الملف...');
+
+    try {
+        const isGoogleDoc = url.hostname === 'docs.google.com' &&
+            url.pathname.includes('/document/');
+        const downloadUrl = isGoogleDoc
+            ? `https://docs.google.com/document/d/${encodeURIComponent(fileId)}/export?format=txt`
+            : `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+        const response = await fetch(downloadUrl);
+
+        if (!response.ok) {
+            throw new Error(`تعذر تنزيل الملف (HTTP ${response.status}).`);
+        }
+
+        if (isGoogleDoc) {
+            const text = await response.text();
+
+            if (response.headers.get('content-type')?.includes('text/html') ||
+                /^\s*<!doctype html|^\s*<html\b/i.test(text)) {
+                throw new Error('لم يمكن قراءة المستند. تأكد من إتاحته لأي شخص لديه الرابط.');
+            }
+
+            setLessonText(text);
+        } else {
+            const data = new Uint8Array(await response.arrayBuffer());
+            const isPdf = new TextDecoder().decode(data.subarray(0, 5)) === '%PDF-';
+
+            if (isPdf) {
+                setLessonText(await extractPdfText(data));
+            } else if (response.headers.get('content-type')?.includes('text/plain')) {
+                setLessonText(await new TextDecoder().decode(data));
+            } else {
+                throw new Error('رابط Drive يجب أن يشير إلى ملف PDF أو TXT أو مستند Google Docs.');
+            }
+        }
+
+        setImportStatus('تم استيراد الملف بنجاح.');
+    } catch (error) {
+        console.error('تعذر استيراد الملف من Google Drive:', error);
+        const message = error instanceof TypeError
+            ? 'تعذر الوصول إلى الملف من المتصفح. اجعل المشاركة متاحة لأي شخص لديه الرابط، أو نزّل الملف وارفعه من جهازك.'
+            : error.message || 'تعذر استيراد الملف. نزّله وارفعه من جهازك.';
+        setImportStatus(message, true);
+    } finally {
+        driveImportBtn.disabled = false;
+    }
+}
+
+// قراءة ملفات TXT وPDF
 
 fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0];
 
     if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith('.txt')) {
-        alert('يرجى اختيار ملف TXT.');
-        fileInput.value = '';
-        return;
-    }
-
     try {
-        textArea.value = await file.text();
-        charCount.textContent = `${textArea.value.length} حرف`;
-    } catch {
-        alert('تعذرت قراءة الملف.');
+        await readFile(file);
+        setImportStatus('تم تحميل الملف بنجاح.');
+    } catch (error) {
+        console.error('تعذرت قراءة الملف:', error);
+        setImportStatus(error.message || 'تعذرت قراءة الملف.', true);
+        fileInput.value = '';
     }
 });
+
+driveImportBtn.addEventListener('click', importFromDrive);
 
 // تقسيم النص إلى جمل
 
@@ -331,7 +474,6 @@ form.addEventListener('submit', event => {
 
         document.getElementById('retryBtn').addEventListener('click', () => {
             form.requestSubmit();
-            document.getElementById('generator');
         });
     }
 
