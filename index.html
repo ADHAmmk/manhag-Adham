@@ -163,9 +163,11 @@
 
             <div class="upload-box">
                 <strong>📄 ارفع ملف المنهج</strong>
-                <p>يدعم ملفات TXT وPDF، أو استيراد مستند/ملف عام من Google Drive.</p>
+                <p>يدعم ملفات TXT وPDF، ويُحوَّل نص PDF تلقائيًا عند رفعه.</p>
                 <input id="fileInput" type="file"
                        accept=".txt,.pdf,text/plain,application/pdf">
+                <p id="importStatus" class="import-status" role="status"
+                   aria-live="polite"></p>
 
                 <div class="drive-import">
                     <label for="driveUrl">أو الصق رابط ملف من Google Drive</label>
@@ -177,8 +179,6 @@
                             استيراد من Drive
                         </button>
                     </div>
-                    <p id="importStatus" class="import-status" role="status"
-                       aria-live="polite"></p>
                 </div>
             </div>
 
@@ -288,6 +288,5 @@
 <script src="main.js" defer></script>
 </body>
 </html>
-
 
 

@@ -58,12 +58,12 @@ async function readFile(file) {
 
     if (extension === 'txt' || file.type === 'text/plain') {
         setLessonText(await file.text());
-        return;
+        return 'TXT';
     }
 
     if (extension === 'pdf' || file.type === 'application/pdf') {
         setLessonText(await extractPdfText(new Uint8Array(await file.arrayBuffer())));
-        return;
+        return 'PDF';
     }
 
     throw new Error('نوع الملف غير مدعوم. اختر ملف TXT أو PDF.');
@@ -160,12 +160,19 @@ fileInput.addEventListener('change', async () => {
 
     if (!file) return;
 
+    fileInput.disabled = true;
+    setImportStatus('جارٍ قراءة الملف واستخراج النص تلقائيًا...');
+
     try {
-        await readFile(file);
-        setImportStatus('تم تحميل الملف بنجاح.');
+        const fileType = await readFile(file);
+        setImportStatus(fileType === 'PDF'
+            ? 'تم تحويل PDF إلى نص وإضافته إلى مربع النص.'
+            : 'تم تحميل الملف النصي وإضافته إلى مربع النص.');
     } catch (error) {
         console.error('تعذرت قراءة الملف:', error);
         setImportStatus(error.message || 'تعذرت قراءة الملف.', true);
+    } finally {
+        fileInput.disabled = false;
         fileInput.value = '';
     }
 });
